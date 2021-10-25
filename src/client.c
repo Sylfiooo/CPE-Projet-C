@@ -41,8 +41,6 @@ int envoie_recois_message(int socketfd) {
     exit(EXIT_FAILURE);
   }
 
-
-
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
@@ -128,8 +126,8 @@ int main(int argc, char **argv) {
     perror("connection serveur");
     exit(EXIT_FAILURE);
   }
-  //envoie_recois_message(socketfd);
   envoie_recois_message(socketfd);
+  //envoie_couleurs(socketfd, argv[1]);
 
   close(socketfd);
 }

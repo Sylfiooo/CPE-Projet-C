@@ -97,26 +97,12 @@ int recois_envoie_message(int socketfd) {
   char code[10];
   sscanf(data, "%s", code);
 
-  //Renvoie message
-
-  char data2[1024];
-  // la réinitialisation de l'ensemble des données
-  memset(data2, 0, sizeof(data));
-
-
-  // Demandez à l'utilisateur d'entrer un message
-  char message[100];
-  printf("Votre message (max 1000 caracteres): ");
-  fgets(message, 1024, stdin);
-  strcpy(data2, "message: ");
-  strcat(data2, message);
-
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
-    renvoie_message(client_socket_fd, data2);
+    renvoie_message(client_socket_fd, data);
   }
   else {
-    plot(data2);
+    plot(data);
   }
 
   //fermer le socket 
