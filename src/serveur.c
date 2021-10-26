@@ -93,16 +93,27 @@ int recois_envoie_message(int socketfd) {
    * extraire le code des données envoyées par le client. 
    * Les données envoyées par le client peuvent commencer par le mot "message :" ou un autre mot.
    */
-  printf ("Message recu: %s\n", data);
+  printf ("Message reçu: %s\n", data);
   char code[10];
   sscanf(data, "%s", code);
 
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
-    renvoie_message(client_socket_fd, data);
+  	// la réinitialisation de l'ensemble des données
+  	memset(data, 0, sizeof(data));
+
+  	// Demandez à l'utilisateur d'entrer un message
+  	char message[100];
+  	printf("Votre message (max 1000 caracteres): ");
+  	fgets(message, 1024, stdin);
+  	strcpy(data, "message: ");
+  	strcat(data, message);
+
+  	printf("Message envoyé: %s\n", data);
+   	renvoie_message(client_socket_fd, data);
   }
-  else {
-    plot(data);
+  else if (strcmp(code, "couleur:") == 0){
+   	plot(data);
   }
 
   //fermer le socket 

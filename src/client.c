@@ -40,6 +40,8 @@ int envoie_recois_message(int socketfd) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
   }
+  
+  printf("Message envoyé: %s\n", data);
 
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
@@ -52,7 +54,7 @@ int envoie_recois_message(int socketfd) {
     return -1;
   }
 
-  printf("Message recu: %s\n", data);
+  printf("Message reçu: %s\n", data);
  
   return 0;
 }
