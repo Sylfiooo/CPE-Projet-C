@@ -260,6 +260,8 @@ int recois_envoie_message(int socketfd) {
         recois_couleurs(client_socket_fd, data);
     } else if (strcmp(code, "balise:") == 0) {
         recois_balises(client_socket_fd, data);
+    } else if (strcmp(code, "bmp:") == 0) {
+        plot(data);
     }
 
     //fermer le socket 

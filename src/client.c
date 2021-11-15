@@ -142,7 +142,7 @@ void analyse(char * pathname, char * data) {
     couleur_compteur * cc = analyse_bmp_image(pathname);
 
     int count;
-    strcpy(data, "couleurs: ");
+    strcpy(data, "bmp: ");
     char temp_string[10] = "10,";
     if (cc -> size < 10) {
         sprintf(temp_string, "%d,", cc -> size);
@@ -210,6 +210,20 @@ int envoie_couleurs(int socketfd) {
     printf("Résultat reçu: %s\n", data);
 
     return 0;
+}
+
+int envoie_couleurs_image(int socketfd, char *pathname) {
+  char data[1024];
+  memset(data, 0, sizeof(data));
+  analyse(pathname, data);
+  
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
+
+  return 0;
 }
 
 int envoie_balises(int socketfd) {
@@ -292,7 +306,9 @@ int main(int argc, char ** argv) {
     //envoie_recois_message(socketfd);
     //envoie_nom_de_client(socketfd);
     //envoie_couleurs(socketfd);
-    envoie_balises(socketfd);
+    //envoie_balises(socketfd);
+    
+    envoie_couleurs_image(socketfd, argv[1]);
 
     close(socketfd);
 }
