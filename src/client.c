@@ -164,16 +164,50 @@ void analyse(char * pathname, char * data) {
     data[strlen(data) - 1] = '\0';
 }
 
-int envoie_couleurs(int socketfd, char * pathname) {
+int envoie_couleurs(int socketfd) {
     char data[1024];
-    memset(data, 0, sizeof(data));
-    analyse(pathname, data);
+    //analyse(pathname, data);
+
+    // Demandez à l'utilisateur d'entrer un nombre de couleurs et des couleurs en hexa
+    char nb[100];
+    printf("Votre nombre de couleurs (max 30 caracteres): ");
+    fgets(nb, 1024, stdin);
+    strcpy(data, "couleur: ");
+    strcat(data, nb);
+    int nbint = atoi(nb);
+
+    if(nbint > 30) {
+        perror("erreur ecriture");
+        exit(EXIT_FAILURE);
+    }
+
+    char couleur[100];
+
+    while(nbint != 0) {
+        nbint = nbint - 1;
+        printf("Rentrez une couleur: ");
+        fgets(couleur, 1024, stdin);
+        strcat(data, ",");
+        strcat(data, couleur);
+    }
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
         exit(EXIT_FAILURE);
     }
+
+    // la réinitialisation de l'ensemble des données
+    memset(data, 0, sizeof(data));
+
+    // lire les données de la socket
+    int read_status = read(socketfd, data, sizeof(data));
+    if (read_status < 0) {
+        perror("erreur lecture");
+        return -1;
+    }
+
+    printf("Résultat reçu: %s\n", data);
 
     return 0;
 }
@@ -206,10 +240,10 @@ int main(int argc, char ** argv) {
         exit(EXIT_FAILURE);
     }
 
-    envoie_operateur_numeros(socketfd);
+    //envoie_operateur_numeros(socketfd);
     //envoie_recois_message(socketfd);
     //envoie_nom_de_client(socketfd);
-    //envoie_couleurs(socketfd, argv[1]);
+    envoie_couleurs(socketfd);
 
     close(socketfd);
 }

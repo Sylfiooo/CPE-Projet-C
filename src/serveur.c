@@ -79,6 +79,50 @@ int renvoie_nom(int client_socket_fd, char * data) {
 }
 
 /* renvoyer le résultat du calcul (*data) au client (client_socket_fd)
+*/
+
+int recois_couleurs(int client_socket_fd, char * data) {
+
+    char nbcouleurs[10];
+	char buffer[10];
+	
+	//sscanf(data, "%s %s", buffer, );
+	
+    // La définitions de séparateurs connus.
+    const char * separators = ",";
+
+    int boucle = 0;
+
+    //open File
+    FILE *fp;
+    fp = fopen("./couleur.txt", "w");
+
+    // On cherche à récupérer, un à un, tous les mots (token) de la phrase
+    // et on commence par le premier.
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+
+        if (boucle > 0) {
+            fputs( strToken, fp );
+        }
+        // On demande le token suivant.
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+
+    fclose(fp);
+	
+	printf("Data ecrite");
+    int data_size = write(client_socket_fd, (void * ) data, strlen(data));
+	
+    if (data_size < 0) {
+        perror("erreur ecriture");
+        return (EXIT_FAILURE);
+    }
+
+}
+
+/* renvoyer le résultat du calcul (*data) au client (client_socket_fd)
  */
 int recois_numeros_calcul(int client_socket_fd, char * data) {
 
@@ -181,8 +225,9 @@ int recois_envoie_message(int socketfd) {
         renvoie_nom(client_socket_fd, data);
     } else if (strcmp(code, "calcul:") == 0) {
         recois_numeros_calcul(client_socket_fd, data);
-    } else if (strcmp(code, "couleur: ") == 0) {
-        plot(data);
+    } else if (strcmp(code, "couleur:") == 0) {
+        recois_couleurs(client_socket_fd, data);
+        //plot(data);
     }
 
     //fermer le socket 
