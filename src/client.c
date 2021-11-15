@@ -212,6 +212,54 @@ int envoie_couleurs(int socketfd) {
     return 0;
 }
 
+int envoie_balises(int socketfd) {
+    char data[1024];
+    //analyse(pathname, data);
+
+    // Demandez à l'utilisateur d'entrer un nombre de couleurs et des couleurs en hexa
+    char nb[100];
+    printf("Votre nombre de balises (max 30 caracteres): ");
+    fgets(nb, 1024, stdin);
+    strcpy(data, "balise: ");
+    strcat(data, nb);
+    int nbint = atoi(nb);
+
+    if(nbint > 30) {
+        perror("erreur ecriture");
+        exit(EXIT_FAILURE);
+    }
+
+    char balise[100];
+
+    while(nbint != 0) {
+        nbint = nbint - 1;
+        printf("Rentrez une balise: ");
+        fgets(balise, 1024, stdin);
+        strcat(data, ",");
+        strcat(data, balise);
+    }
+
+    int write_status = write(socketfd, data, strlen(data));
+    if (write_status < 0) {
+        perror("erreur ecriture");
+        exit(EXIT_FAILURE);
+    }
+
+    // la réinitialisation de l'ensemble des données
+    memset(data, 0, sizeof(data));
+
+    // lire les données de la socket
+    int read_status = read(socketfd, data, sizeof(data));
+    if (read_status < 0) {
+        perror("erreur lecture");
+        return -1;
+    }
+
+    printf("Résultat reçu: %s\n", data);
+
+    return 0;
+}
+
 int main(int argc, char ** argv) {
     int socketfd;
     int bind_status;
@@ -243,7 +291,8 @@ int main(int argc, char ** argv) {
     //envoie_operateur_numeros(socketfd);
     //envoie_recois_message(socketfd);
     //envoie_nom_de_client(socketfd);
-    envoie_couleurs(socketfd);
+    //envoie_couleurs(socketfd);
+    envoie_balises(socketfd);
 
     close(socketfd);
 }
