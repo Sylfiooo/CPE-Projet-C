@@ -4,7 +4,7 @@
 }
 {
 	"code" : "calcule",
-	"valeurs" : [ "+", "23", "45" ]
+	"valeurs" : [ "+ 23 45" ]
 }
 {
 	"code" : "couleurs",

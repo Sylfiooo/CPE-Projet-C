@@ -23,6 +23,33 @@
 
 #include "bmp.h"
 
+void dataToJson(char * data) {
+    
+    char jsonData[100] = "{ \"code\" : \"";
+    int boucle = 0;
+    const char * separators = ":,";
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+        if (boucle == 0) {
+            strcat(jsonData, strToken);
+            strcat(jsonData, "\", \"valeurs\" : [ ");
+        } else if (boucle > 1) {
+            strcat(jsonData, "\"");
+            strcat(jsonData, strToken);
+            strcat(jsonData, "\",");
+        }
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+    //enlever le dernier virgule
+    int size = strlen(jsonData);
+    jsonData[size-1] = '\0';
+    strcat(jsonData, "]}");
+
+    strcpy(data,jsonData);
+
+}
+
 /* 
  * Fonction d'envoi et de réception de messages
  * Il faut un argument : l'identifiant de la socket
@@ -270,6 +297,10 @@ int envoie_balises(int socketfd) {
         strcat(data, balise);
     }
 
+    dataToJson(data);
+
+    printf("%s", data);
+
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -323,9 +354,8 @@ int main(int argc, char ** argv) {
     //envoie_recois_message(socketfd);
     //envoie_nom_de_client(socketfd);
     //envoie_couleurs(socketfd);
-    //envoie_balises(socketfd);
-    
-    envoie_couleurs_image(socketfd, argv[1]);
+    envoie_balises(socketfd);
+    //envoie_couleurs_image(socketfd, argv[1]);
 
     close(socketfd);
 }

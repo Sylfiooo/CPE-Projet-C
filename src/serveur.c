@@ -23,6 +23,31 @@
 
 #include "serveur.h"
 
+void jsonToData(char * data) {
+    char newData[100] = "";
+    int boucle = 0;
+    const char * separators = "\"";
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+        //code
+        if (boucle == 3) {
+            strcat(newData, strToken);
+            strcat(newData, ": ");
+        //valeur
+        } else if (boucle > 6 && boucle%2 == 1) {
+            strcat(newData, strToken);
+            strcat(newData, ",");
+        }
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+    //enlever le dernier virgule
+    int size = strlen(newData);
+    newData[size-1] = '\0';
+
+    strcpy(data,newData);
+}
+
 void plot(char * data) {
 
     //Extraire le compteur et les couleurs RGB 
@@ -135,7 +160,9 @@ int recois_couleurs(int client_socket_fd, char * data) {
 }
 
 int recois_balises(int client_socket_fd, char * data) {
-	
+    
+    printf("%s", data);
+    
     // La définitions de séparateurs connus.
     const char * separators = ",";
 
@@ -245,12 +272,15 @@ int recois_envoie_message(int socketfd) {
         perror("erreur lecture");
         return (EXIT_FAILURE);
     }
+    
+    printf("Message reçu format json: %s\n", data);
+    jsonToData(data);
+    printf("Message reçu format data: %s\n", data);
 
     /*
      * extraire le code des données envoyées par le client. 
      * Les données envoyées par le client peuvent commencer par le mot "message :" ou un autre mot.
      */
-    printf("Message reçu: %s\n", data);
     char code[10];
     sscanf(data, "%s", code);
 
