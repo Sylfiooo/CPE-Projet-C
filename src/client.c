@@ -23,6 +23,8 @@
 
 #include "bmp.h"
 
+void constjson(char * data);
+
 /* 
  * Fonction d'envoi et de réception de messages
  * Il faut un argument : l'identifiant de la socket
@@ -38,8 +40,10 @@ int envoie_recois_message(int socketfd) {
     char message[100];
     printf("Votre message (max 1000 caracteres): ");
     fgets(message, 1024, stdin);
-    strcpy(data, "message: ");
+    strcpy(data, "message:");
     strcat(data, message);
+    
+    constjson(data);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -76,8 +80,9 @@ int envoie_nom_de_client(int socketfd) {
     // Demandez à l'utilisateur d'entrer un message
     char nom[100];
     gethostname(nom, sizeof(nom));
-    strcpy(data, "nom: ");
+    strcpy(data, "nom:");
     strcat(data, nom);
+    constjson(data);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -111,11 +116,23 @@ int envoie_operateur_numeros(int socketfd) {
 
     // Demandez à l'utilisateur d'entrer un message
     char calcul[100];
+    int count = 0;
     printf("Votre calcul (max 1000 caracteres): ");
     fgets(calcul, 1024, stdin);
-    strcpy(data, "calcul: ");
-    strcat(data, calcul);
-
+    strcpy(data, "calcul:");
+    char * strtoken = strtok(calcul, " ");
+    while(strtoken !=NULL){
+    	if(count == 0){
+			strcat(data, strtoken); 
+		}else{
+			strcat(data, ",");
+			strcat(data, strtoken);
+		}
+		count++;
+		strtoken = strtok(NULL, " ");
+    }
+    
+	constjson(data);
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -153,7 +170,7 @@ void analyse(char * pathname, char * data) {
     }
 
     int count; 
-    strcpy(data, "bmp: ");
+    strcpy(data, "bmp:");
     char temp_string[10] = "";
     strcat(temp_string, nbcouleur);
     strcat(temp_string, ",");
@@ -207,7 +224,7 @@ int envoie_couleurs(int socketfd) {
         strcat(data, ",");
         strcat(data, couleur);
     }
-
+	constjson(data);
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -234,6 +251,7 @@ int envoie_couleurs_image(int socketfd, char *pathname) {
   memset(data, 0, sizeof(data));
   analyse(pathname, data);
   
+  constjson(data);
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
@@ -251,7 +269,7 @@ int envoie_balises(int socketfd) {
     char nb[100];
     printf("Votre nombre de balises (max 30 caracteres): ");
     fgets(nb, 1024, stdin);
-    strcpy(data, "balise: ");
+    strcpy(data, "balise:");
     strcat(data, nb);
     int nbint = atoi(nb);
 
@@ -269,7 +287,7 @@ int envoie_balises(int socketfd) {
         strcat(data, ",");
         strcat(data, balise);
     }
-
+	constjson(data);
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -319,13 +337,42 @@ int main(int argc, char ** argv) {
         exit(EXIT_FAILURE);
     }
 
-    //envoie_operateur_numeros(socketfd);
+    envoie_operateur_numeros(socketfd);
     //envoie_recois_message(socketfd);
     //envoie_nom_de_client(socketfd);
     //envoie_couleurs(socketfd);
     //envoie_balises(socketfd);
     
-    envoie_couleurs_image(socketfd, argv[1]);
+    //envoie_couleurs_image(socketfd, argv[1]);
 
     close(socketfd);
+}
+
+void constjson(char * data){
+	char json[1024] = "";
+	int count = 0;
+	strcat(json, "{ \"code\" : \"");
+	
+	char * strtoken = strtok(data, ": ");
+	strcat(json, strtoken);
+	strcat(json, "\", \"valeurs\" : [ ");
+	
+	strtoken = strtok(NULL, ",");
+	
+	while (strtoken != NULL ){
+		if(count == 0){
+			strcat(json, "\"");
+			strcat(json, strtoken);
+			strcat(json, "\""); 
+		}else{
+			strcat(json, ", \"");
+			strcat(json, strtoken);
+			strcat(json, "\""); 
+		}
+		count++;
+		strtoken = strtok(NULL, ",");
+	}
+	
+	strcat(json, " ] }");
+	strcpy(data, json);
 }
