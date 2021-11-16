@@ -24,7 +24,7 @@
 #include "serveur.h"
 
 void jsonToData(char * data) {
-    char newData[100] = "";
+    char newData[1024] = "";
     int boucle = 0;
     const char * separators = "\"";
     char * strToken = strtok ( data, separators);
@@ -66,8 +66,6 @@ void plot(char * data) {
     fprintf(p, "set xrange [-15:15]\n");
     fprintf(p, "set yrange [-15:15]\n");
     fprintf(p, "set style fill transparent solid 0.9 noborder\n");
-    fprintf(p, "set title 'Top colors'\n");
-    fprintf(p, "plot '-' with circles lc rgbcolor variable\n");
     while (1) {
         char * token = strtok_r(str, ",", & saveptr);
         if (token == NULL) {
@@ -85,9 +83,11 @@ void plot(char * data) {
                 countcol++;
             }
             intNbCouleur = atoi(nbcouleur);
+    		fprintf(p, "set title 'Top %d colors'\n", intNbCouleur);
+    		fprintf(p, "plot '-' with circles lc rgbcolor variable\n");
         } else {
             // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
-            fprintf(p, "0 0 10 %d %d 0x%s\n", (count - 1) * 360 / intNbCouleur, count * 360 / intNbCouleur, token + 1);
+            fprintf(p, "0 0 10 %f %f 0x%s\n", (float)((count - 1) * 360 / intNbCouleur), (float)(count * 360 / intNbCouleur), token + 1);
         }
         count++;
     }
@@ -203,9 +203,9 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
 
 	char nb1[10];
 	char nb2[10];
-    int inb1;
-    int inb2;
-    int result;
+    double inb1;
+    double inb2;
+    double result;
 	char operator[10];
     int boucle = 0;
     const char * separators = ":,";
@@ -216,10 +216,10 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
             strcpy(operator, strToken);
         } else if (boucle == 2) {
             strcpy(nb1, strToken);
-            inb1 = atoi(nb1);
+            inb1 = atof(nb1);
         } else if (boucle == 3) {
             strcpy(nb2, strToken);
-            inb2 = atoi(nb2);
+            inb2 = atof(nb2);
         }
         // On demande le token suivant.
         strToken = strtok ( NULL, separators );
@@ -241,14 +241,14 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
 	
 	memset(data, 0, sizeof(data));
 	char s[10];
-	sprintf(s, "%d", inb1);
+	sprintf(s, "%f", inb1);
     strcat(data, s);
     strcat(data, operator);
     strcat(data, " ");
-    sprintf(s, "%d", inb2);
+    sprintf(s, "%f", inb2);
     strcat(data, s);
     strcat(data, " = ");
-    sprintf(s, "%d", result);
+    sprintf(s, "%f", result);
     strcat(data, s);
 	
 	printf("Message envoyé : %s\n", data);

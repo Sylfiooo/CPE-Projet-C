@@ -27,7 +27,7 @@ void dataToJson(char * data, int type) {
     
     //type 1 pour data avec un int nb devant les valeurs
     //type 2 pour data qui donne directement les valeurs
-    char jsonData[100] = "{ \"code\" : \"";
+    char jsonData[1024] = "{ \"code\" : \"";
     int boucle = 0;
     const char * separators = ":,";
     char * strToken = strtok ( data, separators);
@@ -289,6 +289,8 @@ int envoie_couleurs_image(int socketfd, char *pathname) {
   memset(data, 0, sizeof(data));
   analyse(pathname, data);
   
+  dataToJson(data, 2);
+  
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
@@ -376,13 +378,22 @@ int main(int argc, char ** argv) {
         perror("connection serveur");
         exit(EXIT_FAILURE);
     }
-
-    //envoie_operateur_numeros(socketfd);               //fonctionne Json
-    //envoie_recois_message(socketfd);                  //fonctionne Json
-    //envoie_nom_de_client(socketfd);                   //fonctionne Json
-    //envoie_couleurs(socketfd);                        //fonctionne Json
-    //envoie_balises(socketfd);                         //fonctionne Json
-    //envoie_couleurs_image(socketfd, argv[1]);         //fonctionne pas Json
+    
+    if(strcmp(argv[1], "nom") == 0){
+    	envoie_nom_de_client(socketfd);
+    }else if(strcmp(argv[1], "message") == 0){
+    	envoie_recois_message(socketfd);
+    }else if(strcmp(argv[1], "calcul") == 0){
+    	envoie_operateur_numeros(socketfd);
+    }else if(strcmp(argv[1], "couleurs") == 0){
+    	envoie_couleurs(socketfd);
+    }else if(strcmp(argv[1], "balises") == 0){
+    	envoie_balises(socketfd);
+    }else if(strcmp(argv[1], "bmp") == 0 && argv[2]){
+    	envoie_couleurs_image(socketfd, argv[2]);
+    }else{
+    	printf("La saisie n'est pas correcte. Utilisation : ./client (nom/message/calcul/couleurs/balises/bmp) [path_for_bmp]\n");
+    }
 
     close(socketfd);
 }

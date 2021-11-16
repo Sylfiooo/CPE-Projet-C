@@ -7,9 +7,15 @@
 *
 
 # Difficulté
-*
+* Passer les arguments à travers le JSON, problème qui a finalement été résolu
+* La gestion des types en C est assez compliquée à suivre
 
 # Commentaires
-* 
-* 
+* Toutes les fonctions sont accessibles en faisant ./client laFonction. Il existe 5 fonctions :
+	* name = Renvoie le hostname
+	* message = Permet d'envoyer un message et d'en recevoir un du serveur
+	* calcul = Réalise un calcul sous la forme "opérateur nombre1 nombre2"
+	* couleurs = Permet d'envoyer un nombre n de couleurs au serveur
+	* balises = Permet d'envoyer un nombre n de balises au serveur, et de les faire s'enregistrer dans un fichier
+	* bmp [path] = Permet d'analyser une image de chemin path et d'afficher les n couleurs les plus prépondérantes de celle-ci.
 
