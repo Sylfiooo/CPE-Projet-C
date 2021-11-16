@@ -50,6 +50,8 @@ void jsonToData(char * data) {
 
 void plot(char * data) {
 
+    
+
     //Extraire le compteur et les couleurs RGB 
     FILE * p = popen("gnuplot -persist", "w");
     printf("Plot");
@@ -82,11 +84,7 @@ void plot(char * data) {
                 strToken = strtok ( NULL, separators );
                 countcol++;
             }
-            printf("%s", "\n");
-            printf("%s", "\n");
-            printf("%s", nbcouleur);
             intNbCouleur = atoi(nbcouleur);
-            printf("%d", intNbCouleur); 
         } else {
             // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
             fprintf(p, "0 0 10 %d %d 0x%s\n", (count - 1) * 360 / intNbCouleur, count * 360 / intNbCouleur, token + 1);
@@ -125,8 +123,10 @@ int renvoie_nom(int client_socket_fd, char * data) {
 
 int recois_couleurs(int client_socket_fd, char * data) {
 	
+    printf("%s", data);
+    
     // La définitions de séparateurs connus.
-    const char * separators = ",";
+    const char * separators = ":,";
 
     int boucle = 0;
 
@@ -164,7 +164,7 @@ int recois_balises(int client_socket_fd, char * data) {
     printf("%s", data);
     
     // La définitions de séparateurs connus.
-    const char * separators = ",";
+    const char * separators = ":,";
 
     int boucle = 0;
 
@@ -201,23 +201,39 @@ int recois_balises(int client_socket_fd, char * data) {
  */
 int recois_numeros_calcul(int client_socket_fd, char * data) {
 
-	double nb1;
-	double nb2;
-	double result;
-	
+	char nb1[10];
+	char nb2[10];
+    int inb1;
+    int inb2;
+    int result;
 	char operator[10];
-	char buffer[10];
-	
-	sscanf(data, "%s %s %lf %lf", buffer, operator, &nb1, &nb2);
-	
-	if (strcmp(operator, "+") == 0){
-		result = nb1 + nb2;
-	} else if (strcmp(operator, "-") == 0){
-		result = nb1 - nb2;
-	} else if (strcmp(operator, "*") == 0){
-		result = nb1 * nb2;
-	} else if (strcmp(operator, "/") == 0){
-		result = nb1 / nb2;
+    int boucle = 0;
+    const char * separators = ":,";
+    
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+        if (boucle == 1) {
+            strcpy(operator, strToken);
+        } else if (boucle == 2) {
+            strcpy(nb1, strToken);
+            inb1 = atoi(nb1);
+        } else if (boucle == 3) {
+            strcpy(nb2, strToken);
+            inb2 = atoi(nb2);
+        }
+        // On demande le token suivant.
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+
+	if (strcmp(operator, " +") == 0){
+		result = inb1 + inb2;
+	} else if (strcmp(operator, " -") == 0){
+		result = inb1 - inb2;
+	} else if (strcmp(operator, " *") == 0){
+		result = inb1 * inb2;
+	} else if (strcmp(operator, " /") == 0){
+		result = inb1 / inb2;
 	} else {
 		perror("erreur écriture");
 		return (EXIT_FAILURE);
@@ -225,15 +241,14 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
 	
 	memset(data, 0, sizeof(data));
 	char s[10];
-	sprintf(s, "%lf", nb1);
+	sprintf(s, "%d", inb1);
     strcat(data, s);
-    strcat(data, " ");
     strcat(data, operator);
     strcat(data, " ");
-    sprintf(s, "%lf", nb2);
+    sprintf(s, "%d", inb2);
     strcat(data, s);
     strcat(data, " = ");
-    sprintf(s, "%lf", result);
+    sprintf(s, "%d", result);
     strcat(data, s);
 	
 	printf("Message envoyé : %s\n", data);
@@ -273,9 +288,9 @@ int recois_envoie_message(int socketfd) {
         return (EXIT_FAILURE);
     }
     
-    printf("Message reçu format json: %s\n", data);
+    printf("Message reçu format json:%s\n", data);
     jsonToData(data);
-    printf("Message reçu format data: %s\n", data);
+    printf("Message reçu format data:%s\n", data);
 
     /*
      * extraire le code des données envoyées par le client. 
@@ -295,6 +310,8 @@ int recois_envoie_message(int socketfd) {
         fgets(message, 1024, stdin);
         strcpy(data, "message:");
         strcat(data, message);
+
+
 
         printf("Message envoyé: %s\n", data);
         renvoie_message(client_socket_fd, data);

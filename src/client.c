@@ -23,8 +23,10 @@
 
 #include "bmp.h"
 
-void dataToJson(char * data) {
+void dataToJson(char * data, int type) {
     
+    //type 1 pour data avec un int nb devant les valeurs
+    //type 2 pour data qui donne directement les valeurs
     char jsonData[100] = "{ \"code\" : \"";
     int boucle = 0;
     const char * separators = ":,";
@@ -33,6 +35,10 @@ void dataToJson(char * data) {
         if (boucle == 0) {
             strcat(jsonData, strToken);
             strcat(jsonData, "\", \"valeurs\" : [ ");
+        } else if (boucle > 0 && type == 2) {
+            strcat(jsonData, "\"");
+            strcat(jsonData, strToken);
+            strcat(jsonData, "\",");
         } else if (boucle > 1) {
             strcat(jsonData, "\"");
             strcat(jsonData, strToken);
@@ -47,9 +53,7 @@ void dataToJson(char * data) {
     strcat(jsonData, "]}");
 
     strcpy(data,jsonData);
-
 }
-void constjson(char * data);
 
 /* 
  * Fonction d'envoi et de réception de messages
@@ -68,8 +72,9 @@ int envoie_recois_message(int socketfd) {
     fgets(message, 1024, stdin);
     strcpy(data, "message:");
     strcat(data, message);
-    
-    constjson(data);
+
+    //donne directement les valeurs derriere message donc type 2
+    dataToJson(data, 2);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -108,7 +113,9 @@ int envoie_nom_de_client(int socketfd) {
     gethostname(nom, sizeof(nom));
     strcpy(data, "nom:");
     strcat(data, nom);
-    constjson(data);
+
+    //donne directement les valeurs derriere message donc type 2
+    dataToJson(data, 2);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -157,8 +164,10 @@ int envoie_operateur_numeros(int socketfd) {
 		count++;
 		strtoken = strtok(NULL, " ");
     }
+
+    //donne directement les valeurs derriere message donc type 2
+    dataToJson(data, 2);
     
-	constjson(data);
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -250,7 +259,10 @@ int envoie_couleurs(int socketfd) {
         strcat(data, ",");
         strcat(data, couleur);
     }
-	constjson(data);
+
+    //donne un nombre de couleurs avant les valeurs derriere message donc type 1
+    dataToJson(data, 1);
+
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -277,7 +289,6 @@ int envoie_couleurs_image(int socketfd, char *pathname) {
   memset(data, 0, sizeof(data));
   analyse(pathname, data);
   
-  constjson(data);
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
@@ -314,11 +325,9 @@ int envoie_balises(int socketfd) {
         strcat(data, balise);
     }
 
-    dataToJson(data);
+    //donne un nombre de couleurs avant les valeurs derriere message donc type 1
+    dataToJson(data, 1);
 
-    printf("%s", data);
-
-	constjson(data);
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -368,43 +377,41 @@ int main(int argc, char ** argv) {
         exit(EXIT_FAILURE);
     }
 
-    envoie_operateur_numeros(socketfd);
-    //envoie_recois_message(socketfd);
-    //envoie_nom_de_client(socketfd);
-    //envoie_couleurs(socketfd);
-    envoie_balises(socketfd);
-    //envoie_balises(socketfd);
-    
-    //envoie_couleurs_image(socketfd, argv[1]);
+    //envoie_operateur_numeros(socketfd);               //fonctionne Json
+    //envoie_recois_message(socketfd);                  //fonctionne Json
+    //envoie_nom_de_client(socketfd);                   //fonctionne Json
+    //envoie_couleurs(socketfd);                        //fonctionne Json
+    //envoie_balises(socketfd);                         //fonctionne Json
+    //envoie_couleurs_image(socketfd, argv[1]);         //fonctionne pas Json
 
     close(socketfd);
 }
 
-void constjson(char * data){
-	char json[1024] = "";
-	int count = 0;
-	strcat(json, "{ \"code\" : \"");
+// void constjson(char * data){
+// 	char json[1024] = "";
+// 	int count = 0;
+// 	strcat(json, "{ \"code\" : \"");
 	
-	char * strtoken = strtok(data, ": ");
-	strcat(json, strtoken);
-	strcat(json, "\", \"valeurs\" : [ ");
+// 	char * strtoken = strtok(data, ": ");
+// 	strcat(json, strtoken);
+// 	strcat(json, "\", \"valeurs\" : [ ");
 	
-	strtoken = strtok(NULL, ",");
+// 	strtoken = strtok(NULL, ",");
 	
-	while (strtoken != NULL ){
-		if(count == 0){
-			strcat(json, "\"");
-			strcat(json, strtoken);
-			strcat(json, "\""); 
-		}else{
-			strcat(json, ", \"");
-			strcat(json, strtoken);
-			strcat(json, "\""); 
-		}
-		count++;
-		strtoken = strtok(NULL, ",");
-	}
+// 	while (strtoken != NULL ){
+// 		if(count == 0){
+// 			strcat(json, "\"");
+// 			strcat(json, strtoken);
+// 			strcat(json, "\""); 
+// 		}else{
+// 			strcat(json, ", \"");
+// 			strcat(json, strtoken);
+// 			strcat(json, "\""); 
+// 		}
+// 		count++;
+// 		strtoken = strtok(NULL, ",");
+// 	}
 	
-	strcat(json, " ] }");
-	strcpy(data, json);
-}
+// 	strcat(json, " ] }");
+// 	strcpy(data, json);
+// }

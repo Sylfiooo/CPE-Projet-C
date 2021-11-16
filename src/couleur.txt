@@ -1,3 +1,2 @@
-#ffffff
-#eeeeee
-#dddddd
+ #efefef
+#fefefe
