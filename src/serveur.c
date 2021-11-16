@@ -29,13 +29,17 @@ void plot(char * data) {
     FILE * p = popen("gnuplot -persist", "w");
     printf("Plot");
     int count = 0;
+    int countcol = 0;
     int n;
     char * saveptr = NULL;
     char * str = data;
+    const char * separators = ":";
+    char nbcouleur[10];
+    int intNbCouleur;
     fprintf(p, "set xrange [-15:15]\n");
     fprintf(p, "set yrange [-15:15]\n");
     fprintf(p, "set style fill transparent solid 0.9 noborder\n");
-    fprintf(p, "set title 'Top 10 colors'\n");
+    fprintf(p, "set title 'Top colors'\n");
     fprintf(p, "plot '-' with circles lc rgbcolor variable\n");
     while (1) {
         char * token = strtok_r(str, ",", & saveptr);
@@ -45,9 +49,22 @@ void plot(char * data) {
         str = NULL;
         if (count == 0) {
             n = atoi(token);
+            char * strToken = strtok ( token, separators );
+            while ( strToken != NULL ) {
+                if (countcol == 1) {
+                    strcat(nbcouleur, strToken);
+                }
+                strToken = strtok ( NULL, separators );
+                countcol++;
+            }
+            printf("%s", "\n");
+            printf("%s", "\n");
+            printf("%s", nbcouleur);
+            intNbCouleur = atoi(nbcouleur);
+            printf("%d", intNbCouleur); 
         } else {
             // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
-            fprintf(p, "0 0 10 %d %d 0x%s\n", (count - 1) * 36, count * 36, token + 1);
+            fprintf(p, "0 0 10 %d %d 0x%s\n", (count - 1) * 360 / intNbCouleur, count * 360 / intNbCouleur, token + 1);
         }
         count++;
     }

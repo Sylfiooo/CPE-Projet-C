@@ -141,16 +141,31 @@ void analyse(char * pathname, char * data) {
     //compte de couleurs
     couleur_compteur * cc = analyse_bmp_image(pathname);
 
-    int count;
+    //choisir un nombre de couleurs
+    char nbcouleur[10];
+    printf("Nombre de couleurs (max 30): ");
+    fgets(nbcouleur, 1024, stdin);
+    int intnbcouleur = atoi(nbcouleur);
+
+    if(intnbcouleur > 30) {
+        perror("erreur ecriture");
+        exit(EXIT_FAILURE);
+    }
+
+    int count; 
     strcpy(data, "bmp: ");
-    char temp_string[10] = "10,";
+    char temp_string[10] = "";
+    strcat(temp_string, nbcouleur);
+    strcat(temp_string, ",");
+
     if (cc -> size < 10) {
         sprintf(temp_string, "%d,", cc -> size);
     }
     strcat(data, temp_string);
 
-    //choisir 10 couleurs
-    for (count = 1; count < 11 && cc -> size - count > 0; count++) {
+    intnbcouleur++;
+
+    for (count = 1; count < intnbcouleur && cc -> size - count > 0; count++) {
         if (cc -> compte_bit == BITS32) {
             sprintf(temp_string, "#%02x%02x%02x,", cc -> cc.cc24[cc -> size - count].c.rouge, cc -> cc.cc32[cc -> size - count].c.vert, cc -> cc.cc32[cc -> size - count].c.bleu);
         }
@@ -159,6 +174,8 @@ void analyse(char * pathname, char * data) {
         }
         strcat(data, temp_string);
     }
+
+    printf("%s", data);
 
     //enlever le dernier virgule
     data[strlen(data) - 1] = '\0';
