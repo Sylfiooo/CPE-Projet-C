@@ -1,0 +1,16 @@
+{
+	"code" : "message",
+	"valeurs" : [ "bonjour"]
+}
+{
+	"code" : "calcule",
+	"valeurs" : [ "+", "23", "45" ]
+}
+{
+	"code" : "couleurs",
+	"valeurs" : [ "#0effeee", "#0effe23", "#0ffffff", "#0eeeeee" ]
+}
+{
+	"code" : "balises",
+	"valeurs" : [ "#nature", "#arbre", "#voiture", "#maison" ]
+}
