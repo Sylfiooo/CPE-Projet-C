@@ -23,25 +23,25 @@
 
 #include "bmp.h"
 
-void deleteLn(char *text)
+void deleteLn(char *data)
 {
     int j;
-    j = strlen(text);
+    j = strlen(data);
     while(j--)
     {
-        if(text[j] == 10)
-            text[j] = '\0';
+        if(data[j] == 10)
+            data[j] = '\0';
 
     }
 }
 
-char isNumber(char *text)
+char isNumber(char *data)
 {
     int j;
-    j = strlen(text);
+    j = strlen(data);
     while(j--)
     {
-        if(text[j] >= '0' && text[j] <= '9')
+        if(data[j] >= '0' && data[j] <= '9')
             continue;
 
         return 0;
