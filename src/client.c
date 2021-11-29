@@ -36,9 +36,14 @@ void dataToJson(char * data, int type) {
             strcat(jsonData, strToken);
             strcat(jsonData, "\", \"valeurs\" : [ ");
         } else if (boucle > 0 && type == 2) {
-            strcat(jsonData, "\"");
-            strcat(jsonData, strToken);
-            strcat(jsonData, "\",");
+            if (isdigit(strToken)) {
+
+            } else {
+                strcat(jsonData, "\"");
+                strcat(jsonData, strToken);
+                strcat(jsonData, "\",");
+            }
+
         } else if (boucle > 1) {
             strcat(jsonData, "\"");
             strcat(jsonData, strToken);
