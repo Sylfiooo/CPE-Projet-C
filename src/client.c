@@ -23,6 +23,32 @@
 
 #include "bmp.h"
 
+void deleteLn(char *text)
+{
+    int j;
+    j = strlen(text);
+    while(j--)
+    {
+        if(text[j] == 10)
+            text[j] = '\0';
+
+    }
+}
+
+char isNumber(char *text)
+{
+    int j;
+    j = strlen(text);
+    while(j--)
+    {
+        if(text[j] >= '0' && text[j] <= '9')
+            continue;
+
+        return 0;
+    }
+    return 1;
+}
+
 void dataToJson(char * data, int type) {
     
     //type 1 pour data avec un int nb devant les valeurs
@@ -32,12 +58,14 @@ void dataToJson(char * data, int type) {
     const char * separators = ":,";
     char * strToken = strtok ( data, separators);
     while ( strToken != NULL) {
+        deleteLn(strToken);
         if (boucle == 0) {
             strcat(jsonData, strToken);
             strcat(jsonData, "\", \"valeurs\" : [ ");
         } else if (boucle > 0 && type == 2) {
-            if (isdigit(strToken)) {
-
+            if (isNumber(strToken)) {
+                strcat(jsonData, strToken);
+                strcat(jsonData, ",");
             } else {
                 strcat(jsonData, "\"");
                 strcat(jsonData, strToken);
@@ -45,9 +73,15 @@ void dataToJson(char * data, int type) {
             }
 
         } else if (boucle > 1) {
-            strcat(jsonData, "\"");
-            strcat(jsonData, strToken);
-            strcat(jsonData, "\",");
+            if (isNumber(strToken)) {
+                strcat(jsonData, strToken);
+                strcat(jsonData, ",");   
+            } else {
+                strcat(jsonData, "\"");
+                strcat(jsonData, strToken);
+                strcat(jsonData, "\",");
+            }
+
         }
         strToken = strtok ( NULL, separators );
         boucle++;
