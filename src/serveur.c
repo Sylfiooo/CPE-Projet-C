@@ -23,10 +23,81 @@
 
 #include "serveur.h"
 
+void deleteLn(char *text)
+{
+    int j;
+    j = strlen(text);
+    while(j--)
+    {
+        if(text[j] == 10)
+            text[j] = '\0';
+
+    }
+}
+
+char isNumber(char *text)
+{
+    int j;
+    j = strlen(text);
+    while(j--)
+    {
+        if(text[j] >= '0' && text[j] <= '9')
+            continue;
+
+        return 0;
+    }
+    return 1;
+}
+
+void dataToJson(char * data, int type) {
+    
+    //type 1 pour data avec un int nb devant les valeurs
+    //type 2 pour data qui donne directement les valeurs
+    char jsonData[1024] = "{ \"code\" : \"";
+    int boucle = 0;
+    const char * separators = ":,";
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+        deleteLn(strToken);
+        if (boucle == 0) {
+            strcat(jsonData, strToken);
+            strcat(jsonData, "\", \"valeurs\" : [");
+        } else if (boucle > 0 && type == 2) {
+            if (isNumber(strToken)) {
+                strcat(jsonData, strToken);
+                strcat(jsonData, ",");
+            } else {
+                strcat(jsonData, "\"");
+                strcat(jsonData, strToken);
+                strcat(jsonData, "\",");
+            }
+
+        } else if (boucle > 1) {
+            if (isNumber(strToken)) {
+                strcat(jsonData, strToken);
+                strcat(jsonData, ",");   
+            } else {
+                strcat(jsonData, "\"");
+                strcat(jsonData, strToken);
+                strcat(jsonData, "\",");
+            }
+
+        }
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+    //enlever le dernier virgule
+    int size = strlen(jsonData);
+    jsonData[size-1] = '\0';
+    strcat(jsonData, "]}");
+
+    strcpy(data,jsonData);
+}
+
 void jsonToData(char * data) {
     char newData[1024] = "";
     int boucle = 0;
-    const char * separators = "\"";
+    const char * separators = "\",[]}";
     char * strToken = strtok ( data, separators);
     while ( strToken != NULL) {
         //code
@@ -34,7 +105,8 @@ void jsonToData(char * data) {
             strcat(newData, strToken);
             strcat(newData, ": ");
         //valeur
-        } else if (boucle > 6 && boucle%2 == 1) {
+        } else if (boucle > 6  && strToken != "valeurs") {
+            //else if (boucle > 6 && boucle%2 == 1) {
             strcat(newData, strToken);
             strcat(newData, ",");
         }
@@ -161,14 +233,13 @@ int recois_couleurs(int client_socket_fd, char * data) {
 
 int recois_balises(int client_socket_fd, char * data) {
     
-    printf("%s", data);
+    printf("\n Balises recu en format data %s", data);
     
     // La définitions de séparateurs connus.
     const char * separators = ":,";
 
     int boucle = 0;
 
-    //open File
     FILE *fp;
     fp = fopen("./balise.txt", "w");
 
@@ -176,9 +247,9 @@ int recois_balises(int client_socket_fd, char * data) {
     // et on commence par le premier.
     char * strToken = strtok ( data, separators);
     while ( strToken != NULL) {
-
         if (boucle > 0) {
             fputs( strToken, fp );
+            fputs("\n", fp);
         }
         // On demande le token suivant.
         strToken = strtok ( NULL, separators );
@@ -187,7 +258,7 @@ int recois_balises(int client_socket_fd, char * data) {
 
     fclose(fp);
 	
-	printf("Data ecrite");
+	printf("\n Data ecrite dans balise.txt");
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -313,10 +384,14 @@ int recois_envoie_message(int socketfd) {
 
 
 
-        printf("Message envoyé: %s\n", data);
+        printf("Message envoyé format data: %s\n", data);
+        dataToJson(data, 2);
+        printf("Message envoyé format json: %s\n", data);
         renvoie_message(client_socket_fd, data);
     } else if (strcmp(code, "nom:") == 0) {
-        printf("Message envoyé: %s\n", data);
+        printf("Hostname envoyé format data: %s\n", data);
+        dataToJson(data, 2);
+        printf("Hostname envoyé format json: %s\n", data);
         renvoie_nom(client_socket_fd, data);
     } else if (strcmp(code, "calcul:") == 0) {
         recois_numeros_calcul(client_socket_fd, data);

@@ -61,7 +61,7 @@ void dataToJson(char * data, int type) {
         deleteLn(strToken);
         if (boucle == 0) {
             strcat(jsonData, strToken);
-            strcat(jsonData, "\", \"valeurs\" : [ ");
+            strcat(jsonData, "\", \"valeurs\" : [");
         } else if (boucle > 0 && type == 2) {
             if (isNumber(strToken)) {
                 strcat(jsonData, strToken);
@@ -92,6 +92,32 @@ void dataToJson(char * data, int type) {
     strcat(jsonData, "]}");
 
     strcpy(data,jsonData);
+}
+
+void jsonToData(char * data) {
+    char newData[1024] = "";
+    int boucle = 0;
+    const char * separators = "\",[]}";
+    char * strToken = strtok ( data, separators);
+    while ( strToken != NULL) {
+        //code
+        if (boucle == 3) {
+            strcat(newData, strToken);
+            strcat(newData, ": ");
+        //valeur
+        } else if (boucle > 6  && strToken != "valeurs") {
+            //else if (boucle > 6 && boucle%2 == 1) {
+            strcat(newData, strToken);
+            strcat(newData, ",");
+        }
+        strToken = strtok ( NULL, separators );
+        boucle++;
+    }
+    //enlever le dernier virgule
+    int size = strlen(newData);
+    newData[size-1] = '\0';
+
+    strcpy(data,newData);
 }
 
 /* 
@@ -133,7 +159,9 @@ int envoie_recois_message(int socketfd) {
         return -1;
     }
 
-    printf("Message reçu: %s\n", data);
+    printf("Message reçu format json: %s\n", data);
+    jsonToData(data);
+    printf("Message reçu format data: %s\n", data);
 
     return 0;
 }
@@ -172,7 +200,9 @@ int envoie_nom_de_client(int socketfd) {
         return -1;
     }
 
-    printf("Hostname reçu: %s\n", data);
+    printf("Hostname reçu format json: %s\n", data);
+    jsonToData(data);
+    printf("Hostname reçu format data: %s\n", data);
 
     return 0;
 }
