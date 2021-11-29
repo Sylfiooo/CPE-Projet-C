@@ -194,8 +194,6 @@ int renvoie_nom(int client_socket_fd, char * data) {
 */
 
 int recois_couleurs(int client_socket_fd, char * data) {
-	
-    printf("%s", data);
     
     // La définitions de séparateurs connus.
     const char * separators = ":,";
@@ -213,6 +211,7 @@ int recois_couleurs(int client_socket_fd, char * data) {
 
         if (boucle > 0) {
             fputs( strToken, fp );
+            fputs("\n", fp);
         }
         // On demande le token suivant.
         strToken = strtok ( NULL, separators );
@@ -221,7 +220,7 @@ int recois_couleurs(int client_socket_fd, char * data) {
 
     fclose(fp);
 	
-	printf("Data ecrite");
+	printf("Data ecrite dans couleur.txt");
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -232,8 +231,6 @@ int recois_couleurs(int client_socket_fd, char * data) {
 }
 
 int recois_balises(int client_socket_fd, char * data) {
-    
-    printf("\n Balises recu en format data %s", data);
     
     // La définitions de séparateurs connus.
     const char * separators = ":,";
