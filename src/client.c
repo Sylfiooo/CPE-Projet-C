@@ -378,23 +378,25 @@ int main(int argc, char ** argv) {
         perror("connection serveur");
         exit(EXIT_FAILURE);
     }
-    
-    if(strcmp(argv[1], "nom") == 0){
-    	envoie_nom_de_client(socketfd);
-    }else if(strcmp(argv[1], "message") == 0){
-    	envoie_recois_message(socketfd);
-    }else if(strcmp(argv[1], "calcul") == 0){
-    	envoie_operateur_numeros(socketfd);
-    }else if(strcmp(argv[1], "couleurs") == 0){
-    	envoie_couleurs(socketfd);
-    }else if(strcmp(argv[1], "balises") == 0){
-    	envoie_balises(socketfd);
-    }else if(strcmp(argv[1], "bmp") == 0 && argv[2]){
-    	envoie_couleurs_image(socketfd, argv[2]);
+    if (argv[1]){
+    	if(strcmp(argv[1], "nom") == 0){
+    		envoie_nom_de_client(socketfd);
+    	}else if(strcmp(argv[1], "message") == 0){
+    		envoie_recois_message(socketfd);
+    	}else if(strcmp(argv[1], "calcul") == 0){
+    		envoie_operateur_numeros(socketfd);
+    	}else if(strcmp(argv[1], "couleurs") == 0){
+    		envoie_couleurs(socketfd);
+    	}else if(strcmp(argv[1], "balises") == 0){
+    		envoie_balises(socketfd);
+    	}else if(strcmp(argv[1], "bmp") == 0 && argv[2]){
+    		envoie_couleurs_image(socketfd, argv[2]);
+    	}else{
+    		printf("La saisie n'est pas correcte. Utilisation : ./client (nom/message/calcul/couleurs/balises/bmp) [path_for_bmp]\n");
+    	}
     }else{
-    	printf("La saisie n'est pas correcte. Utilisation : ./client (nom/message/calcul/couleurs/balises/bmp) [path_for_bmp]\n");
+    	printf("Il n'y a pas d'arguments, la saisie n'est pas correcte. Utilisation : ./client (nom/message/calcul/couleurs/balises/bmp) [path_for_bmp]\n");
     }
-
     close(socketfd);
 }
 
