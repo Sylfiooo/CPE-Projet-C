@@ -220,7 +220,8 @@ int recois_couleurs(int client_socket_fd, char * data) {
 
     fclose(fp);
 	
-	printf("Data ecrite dans couleur.txt");
+	strcpy(data, "{\"code\" : \"couleurs\" , \"valeurs\" : [ \"enregistré\" ] }");
+    printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -255,7 +256,8 @@ int recois_balises(int client_socket_fd, char * data) {
 
     fclose(fp);
 	
-	printf("\n Data ecrite dans balise.txt");
+    strcpy(data,"{\"code\" : \"balises\" , \"valeurs\" : [ \"enregistré\" ] }");
+	printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
