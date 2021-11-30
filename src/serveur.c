@@ -35,7 +35,7 @@ void deleteLn(char *text)
     }
 }
 
-char isNumber(char *text)
+char isNumber(char * text)
 {
     int j;
     j = strlen(text);
@@ -319,7 +319,13 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
     sprintf(s, "%f", result);
     strcat(data, s);
 	
-	printf("Message envoyé : %s\n", data);
+	printf("Calcul envoyé : %s\n", data);
+
+    strcpy(data, "{\"code\" : \"calcule\" , \"valeurs\" : [ ");
+    strcat(data, s);
+    strcat(data, " ]}"); 
+
+    printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
