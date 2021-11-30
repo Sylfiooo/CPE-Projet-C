@@ -23,6 +23,8 @@
 
 #include "serveur.h"
 
+#include "validation.c"
+
 void deleteLn(char *text)
 {
     int j;

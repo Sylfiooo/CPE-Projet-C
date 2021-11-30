@@ -199,7 +199,7 @@ void validation(char * data) {
     
 }
 
-int main(int argc, char ** argv) {
+/* int main(int argc, char ** argv) {
     validation(strTest);
     validation(strTest2);
     validation(strTest3);
@@ -214,4 +214,4 @@ int main(int argc, char ** argv) {
     validation(strTest12);
     validation(strTest13);
     validation(strTest14);
-}
+} */
