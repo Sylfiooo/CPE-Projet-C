@@ -223,7 +223,12 @@ int recois_couleurs(int client_socket_fd, char * data) {
     fclose(fp);
 	
 	strcpy(data, "{\"code\" : \"couleurs\" , \"valeurs\" : [ \"enregistré\" ] }");
-    printf("Resultat envoyé format JSON: %s\n", data); 
+    printf("Resultat envoyé format JSON: %s\n", data);
+
+    char testData[1024];
+    strncpy(testData, data, 1000);
+    validationJson(testData);
+ 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -259,12 +264,13 @@ int recois_balises(int client_socket_fd, char * data) {
     fclose(fp);
 	
     strcpy(data,"{\"code\" : \"balises\" , \"valeurs\" : [ \"enregistré\" ] }");
+    printf("Resultat envoyé format JSON: %s\n", data); 
 
     char testData[1024];
-    strncpy(testData, data, sizeof(data));
+    strncpy(testData, data, 1024);
+    deleteLn(testData);
     validationJson(testData);
 
-	printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -328,17 +334,18 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
     sprintf(s, "%f", result);
     strcat(data, s);
 	
-	printf("Calcul envoyé : %s\n", data);
+	printf("Calcul: %s\n", data);
 
     strcpy(data, "{\"code\" : \"calcule\" , \"valeurs\" : [ ");
     strcat(data, s);
-    strcat(data, " ]}"); 
+    strcat(data, " ]}");
+    deleteLn(data);
+    printf("Resultat envoyé format JSON: %s\n", data);
 
     char testData[1024];
-    strncpy(testData, data, sizeof(data));
+    strncpy(testData, data, 1000);
     validationJson(testData);
-
-    printf("Resultat envoyé format JSON: %s\n", data); 
+ 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
     if (data_size < 0) {
@@ -375,7 +382,10 @@ int recois_envoie_message(int socketfd) {
         return (EXIT_FAILURE);
     }
     
-    printf("Message reçu format json:%s\n", data);
+    printf("Message reçu format jsons:%s\n", data);
+    char testData[1024];
+    strncpy(testData, data, sizeof(data));
+    validationJson(testData);
     jsonToData(data);
     printf("Message reçu format data:%s\n", data);
 
@@ -398,16 +408,20 @@ int recois_envoie_message(int socketfd) {
         strcpy(data, "message:");
         strcat(data, message);
 
-
-
         printf("Message envoyé format data: %s\n", data);
         dataToJson(data, 2);
         printf("Message envoyé format json: %s\n", data);
+        char testData[1024];
+        strncpy(testData, data, sizeof(data));
+        validationJson(testData);
         renvoie_message(client_socket_fd, data);
     } else if (strcmp(code, "nom:") == 0) {
         printf("Hostname envoyé format data: %s\n", data);
         dataToJson(data, 2);
         printf("Hostname envoyé format json: %s\n", data);
+        char testData[1024];
+        strncpy(testData, data, sizeof(data));
+        validationJson(testData);
         renvoie_nom(client_socket_fd, data);
     } else if (strcmp(code, "calcul:") == 0) {
         recois_numeros_calcul(client_socket_fd, data);

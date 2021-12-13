@@ -21,7 +21,8 @@ int testNum(char * data, int i) {
         i++;
         if (i == j) {
             return 0;
-        } else if (data[i] >= '0' && data[i] <= '9') {
+        } else if (data[i] >= '0' && data[i] <= '9'|| i < j && data[i] == '.' && data[i+1] >= '0' && data[i+1] <= '9') {
+            if (i < j )
             continue;
         } else if (data[i] == ',' || data[i] == ']') {
             break;

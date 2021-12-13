@@ -142,7 +142,9 @@ int envoie_recois_message(int socketfd) {
     strcat(data, message);
 
     //donne directement les valeurs derriere message donc type 2
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 2);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(message));
@@ -167,6 +169,9 @@ int envoie_recois_message(int socketfd) {
     }
 
     printf("Message reçu format json: %s\n", data);
+    memset(testData, 0, sizeof(testData));
+    strncpy(testData, data, sizeof(message));
+    validationJson(testData);
     jsonToData(data);
     printf("Message reçu format data: %s\n", data);
 
@@ -189,7 +194,9 @@ int envoie_nom_de_client(int socketfd) {
     strcat(data, nom);
 
     //donne directement les valeurs derriere message donc type 2
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 2);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(nom));
@@ -210,10 +217,11 @@ int envoie_nom_de_client(int socketfd) {
         perror("erreur lecture");
         return -1;
     }
-
+    
     printf("Hostname reçu format json: %s\n", data);
-    jsonToData(data);
-    printf("Hostname reçu format data: %s\n", data);
+    memset(testData, 0, sizeof(testData));
+    strncpy(testData, data, sizeof(nom));
+    validationJson(testData);
 
     return 0;
 }
@@ -246,7 +254,9 @@ int envoie_operateur_numeros(int socketfd) {
     }
 
     //donne directement les valeurs derriere message donc type 2
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 2);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(calcul));
@@ -268,7 +278,10 @@ int envoie_operateur_numeros(int socketfd) {
         return -1;
     }
 
-    printf("Résultat reçu: %s\n", data);
+    memset(testData, 0, sizeof(data));
+    printf("Résultat reçu format Json: %s\n", data);
+    strncpy(testData, data, 1000);
+    validationJson(testData);
 
     return 0;
 }
@@ -345,7 +358,9 @@ int envoie_couleurs(int socketfd) {
     }
 
     //donne un nombre de couleurs avant les valeurs derriere message donc type 1
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 1);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(couleur));
@@ -367,7 +382,10 @@ int envoie_couleurs(int socketfd) {
         return -1;
     }
 
-    printf("Résultat reçu: %s\n", data);
+    memset(testData, 0, sizeof(data));
+    printf("Résultat reçu format Json: %s\n", data);
+    strncpy(testData, data, 1000);
+    validationJson(testData);
 
     return 0;
 }
@@ -377,7 +395,9 @@ int envoie_couleurs_image(int socketfd, char *pathname) {
     memset(data, 0, sizeof(data));
     analyse(pathname, data);
   
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 2);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(data));
@@ -420,7 +440,9 @@ int envoie_balises(int socketfd) {
     }
 
     //donne un nombre de couleurs avant les valeurs derriere message donc type 1
+    printf("Message envoye format data: %s\n", data);
     dataToJson(data, 1);
+    printf("Message envoye format json: %s\n", data);
 
     char testData[1024];
     strncpy(testData, data, sizeof(balise));
@@ -442,7 +464,10 @@ int envoie_balises(int socketfd) {
         return -1;
     }
 
-    printf("Résultat reçu: %s\n", data);
+    memset(testData, 0, sizeof(data));
+    printf("Résultat reçu format Json: %s\n", data);
+    strncpy(testData, data, 1000);
+    validationJson(testData);
 
     return 0;
 }
@@ -495,32 +520,3 @@ int main(int argc, char ** argv) {
     }
     close(socketfd);
 }
-
-// void constjson(char * data){
-// 	char json[1024] = "";
-// 	int count = 0;
-// 	strcat(json, "{ \"code\" : \"");
-	
-// 	char * strtoken = strtok(data, ": ");
-// 	strcat(json, strtoken);
-// 	strcat(json, "\", \"valeurs\" : [ ");
-	
-// 	strtoken = strtok(NULL, ",");
-	
-// 	while (strtoken != NULL ){
-// 		if(count == 0){
-// 			strcat(json, "\"");
-// 			strcat(json, strtoken);
-// 			strcat(json, "\""); 
-// 		}else{
-// 			strcat(json, ", \"");
-// 			strcat(json, strtoken);
-// 			strcat(json, "\""); 
-// 		}
-// 		count++;
-// 		strtoken = strtok(NULL, ",");
-// 	}
-	
-// 	strcat(json, " ] }");
-// 	strcpy(data, json);
-// }
