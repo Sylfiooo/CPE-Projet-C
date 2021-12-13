@@ -284,74 +284,84 @@ int recois_balises(int client_socket_fd, char * data) {
  */
 int recois_numeros_calcul(int client_socket_fd, char * data) {
 
-	char nb1[10];
-	char nb2[10];
-    double inb1;
-    double inb2;
-    double result;
-	char operator[10];
-    int boucle = 0;
-    const char * separators = ":,";
-    
-    char * strToken = strtok ( data, separators);
-    while ( strToken != NULL) {
-        if (boucle == 1) {
-            strcpy(operator, strToken);
-        } else if (boucle == 2) {
-            strcpy(nb1, strToken);
-            inb1 = atof(nb1);
-        } else if (boucle == 3) {
-            strcpy(nb2, strToken);
-            inb2 = atof(nb2);
-        }
-        // On demande le token suivant.
-        strToken = strtok ( NULL, separators );
-        boucle++;
+  char nb[100];
+  double result;
+  char operator[100];
+  int boucle = 0;
+  const char * separators = ":,";
+  
+  char * strToken = strtok ( data, separators);
+  double listNb[1];
+  while ( strToken != NULL) {
+    if (boucle == 1) {
+      strcpy(operator, strToken);
+    } else if (boucle > 1){
+      strcpy(nb, strToken);
+      listNb = realloc(listNb, sizeof(double)*(boucle-1);
+      listNb[boucle-2] = atof(nb);
     }
+    // On demande le token suivant.
+    strToken = strtok ( NULL, separators );
+    boucle++;
+  }
 
-	if (strcmp(operator, " +") == 0){
-		result = inb1 + inb2;
-	} else if (strcmp(operator, " -") == 0){
-		result = inb1 - inb2;
-	} else if (strcmp(operator, " *") == 0){
-		result = inb1 * inb2;
-	} else if (strcmp(operator, " /") == 0){
-		result = inb1 / inb2;
-	} else {
-		perror("erreur écriture");
-		return (EXIT_FAILURE);
-	}
-	
-	memset(data, 0, sizeof(data));
-	char s[10];
-	sprintf(s, "%f", inb1);
-    strcat(data, s);
-    strcat(data, operator);
-    strcat(data, " ");
-    sprintf(s, "%f", inb2);
-    strcat(data, s);
-    strcat(data, " = ");
-    sprintf(s, "%f", result);
-    strcat(data, s);
-	
-	printf("Calcul: %s\n", data);
-
-    strcpy(data, "{\"code\" : \"calcule\" , \"valeurs\" : [ ");
-    strcat(data, s);
-    strcat(data, " ]}");
-    deleteLn(data);
-    printf("Resultat envoyé format JSON: %s\n", data);
-
-    char testData[1024];
-    strncpy(testData, data, 1000);
-    validationJson(testData);
- 
-    int data_size = write(client_socket_fd, (void * ) data, strlen(data));
-	
-    if (data_size < 0) {
-        perror("erreur ecriture");
-        return (EXIT_FAILURE);
+  if (strcmp(operator, " +") == 0){
+    result = listNb[0] + listNb[1];
+  } else if (strcmp(operator, " -") == 0){
+    result = listNb[0] - listNb[1];
+  } else if (strcmp(operator, " *") == 0){
+    result = listNb[0] * listNb[1];
+  } else if (strcmp(operator, " /") == 0){
+    result = listNb[0] / listNb[1];
+  } else if (strcmp(operator, " moyenne") == 0){
+    double sum = 0;
+    for (i = 0; i < (sizeof(listNb)/sizeof(double)); i++){
+      sum = sum + listNb[i];
     }
+    result = sum / (sizeof(listNb)/sizeof(double));
+  } else if (strcmp(operator, " minimum") == 0){
+    double min = listNb[0];
+    for (i = 1; i < (sizeof(listNb)/sizeof(double)); i++){
+      if (listNb[i] <= min){
+        min = listNb[i];
+      }
+    }
+    result = min;
+  } else if (strcmp(operator, " maximum") == 0){
+    double max = listNb[0];
+    for (i = 1; i < (sizeof(listNb)/sizeof(double)); i++){
+      if (listNb[i] >= max){
+        max = listNb[i];
+      }
+    }
+    result = min;
+  } else if (strcmp(operator, " écart-type") == 0){
+    double sum = 0;
+    for (i = 0; i < (sizeof(listNb)/sizeof(double)); i++){
+      sum = sum + listNb[i];
+    }
+    double moyenne = sum / (sizeof(listNb)/sizeof(double));
+    double sumPonder = 0;
+    for (i = 0; i < (sizeof(listNb)/sizeof(double)); i++){
+      sumPonder = sumPonder + ((listNb - moyenne)*(listNb - moyenne));
+    }
+    result = sqrt(sumPonder/(sizeof(listNb)/sizeof(double)))
+  } else {
+    perror("erreur écriture");
+    return (EXIT_FAILURE);
+  }    
+  memset(data, 0, sizeof(data));
+  char s[100];
+  sprintf(s, "%f", result);
+  strcat(data, s);
+  printf("Message envoyé : %s\n", data);
+
+  int data_size = write(client_socket_fd, (void * ) data, strlen(data));    
+
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return (EXIT_FAILURE);
+  }
 }
 
 /* accepter la nouvelle connection d'un client et lire les données
