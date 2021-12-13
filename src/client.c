@@ -23,6 +23,8 @@
 
 #include "bmp.h"
 
+#include "validation.c"
+
 void deleteLn(char *data)
 {
     int j;

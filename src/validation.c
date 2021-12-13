@@ -54,6 +54,8 @@ int testNum(char * data, int i) {
 //check
 int testJson(char * data) {
 
+    deleteSpace(data);
+
     //check {" x.... }
     int i = 0;
     int j = strlen(data) - 1;
