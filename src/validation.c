@@ -6,31 +6,13 @@
 
 #include <unistd.h>
 
-char strTest[100] = "{\"Code\":\"test\",\"Valeur\":[\"Bonjour\",\"Bonsoir\"]}";
-char strTest2[100] = "{\"Code\":\"test\",\"Valeur\":[\"Bonjour\"]}";
-char strTest3[100] = "{\"Code\":\"test\",\"Valeur\":[38,45]}";
-char strTest4[100] = "{\"Code\":\"test\",\"Valeur\":[38]}";
-char strTest5[100] = "{\"Code\":\"test\",\"Valeur\":[Bonjour]}";
-char strTest6[100] = "{\"Code\":\"test\",\"Valeur\":[\"38\"]}";
-char strTest7[100] = "{\"Code\":\"test\",\"Valeur\":[\"38\",45]}";
-char strTest8[100] = "{\"Code\":\"test\",\"Valeur\":\"38\"]}";
-char strTest9[100] = "{\"Code\":\"test\",\"Valeur\":[38]";
-char strTest10[100] = "{\"Code\":\"test\",\"Valeur\":[\"Comment ca va vous ?\"]}";
-char strTest11[100] = "{\"Code\":test\",\"Valeur\":[\"Comment ca va vous ?\"]}";
-char strTest12[100] = "{Code\":\"test\",\"Valeur\":[\"Comment ca va vous ?\"]}";
-char strTest13[100] = "";
-char strTest14[100] = "{\"Code\":\"test\",\"Valeur\":[45,\"38\"]}";
-
-void deleteSpace(char *data)
-{
-    int j;
-    j = strlen(data);
-    while(j--)
-    {
-        if(data[j] == 32)
-            data[j] = '\0';
-
-    }
+void deleteSpace(char * data) {
+    char* tempData = data;
+    do {
+        while (*tempData == ' ') {
+            ++tempData;
+        }
+    } while (*data++ = *tempData++);
 }
 
 int testNum(char * data, int i) {
@@ -60,7 +42,7 @@ int testJson(char * data) {
     int i = 0;
     int j = strlen(data) - 1;
     if (data[0] != '{' || data[1] != '\"' || data[j] != '}') {
-        printf("\nMauvais format de JSON, manque des crochets ou autres.\n");
+        printf("\nMauvais format de JSON, manque des crochets ou autres. 1\n");
         return 0;
     }
 
@@ -183,37 +165,23 @@ int testJson(char * data) {
     //i = }
     if (data[i] == '}' && i == j) {
         return 1;
+    } else {
+        printf("\nMauvais format de JSON, manque des crochets ou autres.\n");
+        return 0;
     }
 
-    printf("\nMauvais format de JSON, manque des crochets ou autres.\n");
-    return 0;
 
 }
 
-void validation(char * data) {
+void validationJson(char * data) {
 
-    deleteSpace(data);
+    int validate = testJson(data);
 
-    printf("\nData : %s\n", data);
-
-    printf("\nResult : %d\n", testJson(data));
-
+    if (validate) {
+        printf("Good Json\n");
+    } else {
+        printf("Bad Json\n");
+    }
+    
     
 }
-
-/* int main(int argc, char ** argv) {
-    validation(strTest);
-    validation(strTest2);
-    validation(strTest3);
-    validation(strTest4);
-    validation(strTest5);
-    validation(strTest6);
-    validation(strTest7);
-    validation(strTest8);
-    validation(strTest9);
-    validation(strTest10);
-    validation(strTest11);
-    validation(strTest12);
-    validation(strTest13);
-    validation(strTest14);
-} */

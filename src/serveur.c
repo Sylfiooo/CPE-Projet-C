@@ -259,6 +259,11 @@ int recois_balises(int client_socket_fd, char * data) {
     fclose(fp);
 	
     strcpy(data,"{\"code\" : \"balises\" , \"valeurs\" : [ \"enregistré\" ] }");
+
+    char testData[1024];
+    strncpy(testData, data, sizeof(data));
+    validationJson(testData);
+
 	printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));
 	
@@ -328,6 +333,10 @@ int recois_numeros_calcul(int client_socket_fd, char * data) {
     strcpy(data, "{\"code\" : \"calcule\" , \"valeurs\" : [ ");
     strcat(data, s);
     strcat(data, " ]}"); 
+
+    char testData[1024];
+    strncpy(testData, data, sizeof(data));
+    validationJson(testData);
 
     printf("Resultat envoyé format JSON: %s\n", data); 
     int data_size = write(client_socket_fd, (void * ) data, strlen(data));

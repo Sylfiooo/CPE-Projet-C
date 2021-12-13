@@ -23,7 +23,7 @@
 
 #include "bmp.h"
 
-#include "validation.c"
+#include "validation.h"
 
 void deleteLn(char *data)
 {
@@ -94,6 +94,7 @@ void dataToJson(char * data, int type) {
     strcat(jsonData, "]}");
 
     strcpy(data,jsonData);
+
 }
 
 void jsonToData(char * data) {
@@ -143,6 +144,10 @@ int envoie_recois_message(int socketfd) {
     //donne directement les valeurs derriere message donc type 2
     dataToJson(data, 2);
 
+    char testData[1024];
+    strncpy(testData, data, sizeof(message));
+    validationJson(testData);
+
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -185,6 +190,10 @@ int envoie_nom_de_client(int socketfd) {
 
     //donne directement les valeurs derriere message donc type 2
     dataToJson(data, 2);
+
+    char testData[1024];
+    strncpy(testData, data, sizeof(nom));
+    validationJson(testData);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -238,6 +247,10 @@ int envoie_operateur_numeros(int socketfd) {
 
     //donne directement les valeurs derriere message donc type 2
     dataToJson(data, 2);
+
+    char testData[1024];
+    strncpy(testData, data, sizeof(calcul));
+    validationJson(testData);
     
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
@@ -334,6 +347,10 @@ int envoie_couleurs(int socketfd) {
     //donne un nombre de couleurs avant les valeurs derriere message donc type 1
     dataToJson(data, 1);
 
+    char testData[1024];
+    strncpy(testData, data, sizeof(couleur));
+    validationJson(testData);
+
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
         perror("erreur ecriture");
@@ -356,19 +373,23 @@ int envoie_couleurs(int socketfd) {
 }
 
 int envoie_couleurs_image(int socketfd, char *pathname) {
-  char data[1024];
-  memset(data, 0, sizeof(data));
-  analyse(pathname, data);
+    char data[1024];
+    memset(data, 0, sizeof(data));
+    analyse(pathname, data);
   
-  dataToJson(data, 2);
-  
-  int write_status = write(socketfd, data, strlen(data));
-  if ( write_status < 0 ) {
-    perror("erreur ecriture");
-    exit(EXIT_FAILURE);
-  }
+    dataToJson(data, 2);
 
-  return 0;
+    char testData[1024];
+    strncpy(testData, data, sizeof(data));
+    validationJson(testData);
+  
+    int write_status = write(socketfd, data, strlen(data));
+    if ( write_status < 0 ) {
+        perror("erreur ecriture");
+        exit(EXIT_FAILURE);
+    }
+
+    return 0;
 }
 
 int envoie_balises(int socketfd) {
@@ -400,6 +421,10 @@ int envoie_balises(int socketfd) {
 
     //donne un nombre de couleurs avant les valeurs derriere message donc type 1
     dataToJson(data, 1);
+
+    char testData[1024];
+    strncpy(testData, data, sizeof(balise));
+    validationJson(testData);
 
     int write_status = write(socketfd, data, strlen(data));
     if (write_status < 0) {
